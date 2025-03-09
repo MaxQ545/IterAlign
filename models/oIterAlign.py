@@ -80,6 +80,7 @@ class oIterAlign:
         # Sort features per node and retain the top 'output_dim'
         feature = torch.sort(hot_matrix, dim=1)[0]
         feature = feature[:, -output_dim:]
+        feature = F.normalize(feature, p=2, dim=-1)
 
         return feature
 

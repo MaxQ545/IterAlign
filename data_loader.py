@@ -2,6 +2,7 @@ import torch
 import json
 from torch_geometric.data import Data
 
+
 class DataLoader:
     """
     Handles dataset loading and conversion to PyTorch Geometric Data objects.

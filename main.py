@@ -1,6 +1,6 @@
 import argparse
 from models import *
-from data import DataLoader
+from data_loader import DataLoader
 from evaluate import Evaluator
 from config import configs
 
@@ -8,8 +8,8 @@ from config import configs
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default="fIterAlign")
-    parser.add_argument('--dataset', type=str, default="DBLP1-DBLP2")
-    parser.add_argument('--remove_rate', type=float, default=0.00)
+    parser.add_argument('--dataset', type=str, default="Facebook-Twitter")
+    parser.add_argument('--remove-rate', type=float, default=0.20)
     args = parser.parse_args()
 
     # Step 1: Initialize dataset and model
