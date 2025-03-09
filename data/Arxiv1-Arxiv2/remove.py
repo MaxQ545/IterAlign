@@ -5,7 +5,7 @@ file_path = 'G1.edgelist'
 G = nx.read_edgelist(file_path, nodetype=int)
 
 # Calculate the number of edges to remove (10% of the total)
-rm_rate = 0.10
+rm_rate = 0.20
 edges_to_remove = int(rm_rate * G.number_of_edges())
 
 # Ensure the graph remains connected after removing edges
