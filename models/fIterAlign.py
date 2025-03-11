@@ -195,6 +195,7 @@ class fIterAlign:
         for epoch in range(num_epoch):
             # Step 1: Select node pairs
             if epoch == 0:
+                plot_pca_2d(x1_deg, x2_deg)
                 hot_nodes1, hot_nodes2, hot_nodes1_rank = self._select_nodes(
                     x1_deg, x2_deg, adj1, adj2, self.num_dp_select, self.dp_min_degree, None
                 )
@@ -358,3 +359,50 @@ def draw_hot_graph_with_intensity(adj_matrix, hot_matrix, step, graph_name="Grap
     plt.colorbar(node_collection, label='Node Intensity')
     plt.title(f"{graph_name} at Diffusion Step {step}")
     plt.savefig(f"image/hot_graph_{graph_name}_step_{step}.png")
+
+
+def plot_pca_2d(X1, X2):
+    """
+    Draw a 2D feature distribution using PCA from two PyTorch feature matrices.
+
+    Parameters:
+    - X1: PyTorch tensor of shape (n1, d), first feature matrix
+    - X2: PyTorch tensor of shape (n2, d), second feature matrix
+
+    The function plots the 2D PCA projection with points from X1 in red and X2 in blue.
+    """
+    # Ensure the feature dimensions match
+    assert X1.shape[1] == X2.shape[1], "Feature dimensions of X1 and X2 must be equal"
+
+    # Concatenate the two matrices along the sample dimension
+    X = torch.cat([X1, X2], dim=0)  # Shape: (n1 + n2, d)
+
+    # Center the data by subtracting the mean of each feature
+    mean = X.mean(dim=0)  # Shape: (d,)
+    X_centered = X - mean  # Shape: (n1 + n2, d)
+
+    # Compute SVD of the centered data
+    U, S, Vh = torch.linalg.svd(X_centered, full_matrices=False)
+    # Vh is V^T, so V = Vh.T; V has shape (d, min(n1+n2, d))
+    V = Vh.T
+
+    # Project the centered data onto the first 2 principal components
+    scores = X_centered @ V[:, :2]  # Shape: (n1 + n2, 2)
+
+    # Split the scores back into the two original sets
+    n1 = X1.shape[0]
+    scores1 = scores[:n1, :]  # Shape: (n1, 2)
+    scores2 = scores[n1:, :]  # Shape: (n2, 2)
+
+    # Convert to NumPy for plotting (handles GPU tensors and detaches gradients)
+    scores1_np = scores1.detach().cpu().numpy()
+    scores2_np = scores2.detach().cpu().numpy()
+
+    # Create scatter plot with different colors
+    plt.scatter(scores1_np[:, 0], scores1_np[:, 1], color='red', label='X1')
+    plt.scatter(scores2_np[:, 0], scores2_np[:, 1], color='blue', label='X2')
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.title('2D PCA Feature Distribution')
+    plt.legend()
+    plt.show()
