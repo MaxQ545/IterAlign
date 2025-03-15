@@ -8,8 +8,8 @@ from config import configs
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default="fIterAlign")
-    parser.add_argument('--dataset', type=str, default="DBLP1-DBLP2")
-    parser.add_argument('--remove-rate', type=float, default=0.20)
+    parser.add_argument('--dataset', type=str, default="Facebook-Twitter")
+    parser.add_argument('--remove-rate', type=float, default=0.00)
     args = parser.parse_args()
 
     # Step 1: Initialize dataset and model
@@ -32,4 +32,4 @@ if __name__ == "__main__":
         alignment=alignment,
         time=time
     )
-    evaluator.evaluate(200)
+    evaluator.evaluate(100)

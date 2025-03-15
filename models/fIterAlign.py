@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import torch.nn.functional as F
 from time import time
 
+from tensorboard.compat.tensorflow_stub.pywrap_tensorflow import masked_crc32c
+
 
 class fIterAlign:
     """
@@ -110,16 +112,19 @@ class fIterAlign:
                               candidate matches in graph 2 sorted by ascending distance.
         """
         # Step 1: Filter nodes by min_degree (if first iteration) or mask aligned nodes
-        if align_links is None:
+        if min_degree is not None:
             deg1 = adj1.sum(dim=1)
             deg2 = adj2.sum(dim=1)
             mask1 = deg1 >= min_degree
             mask2 = deg2 >= min_degree
-        else:
+        elif align_links is not None:
             mask1 = torch.ones(x1.size(0), dtype=torch.bool, device=self.device)
             mask2 = torch.ones(x2.size(0), dtype=torch.bool, device=self.device)
             mask1[align_links[0]] = False
             mask2[align_links[1]] = False
+        else:
+            mask1 = torch.ones(x1.size(0), dtype=torch.bool, device=self.device)
+            mask2 = torch.ones(x2.size(0), dtype=torch.bool, device=self.device)
 
         select_nodes1 = torch.nonzero(mask1, as_tuple=True)[0]
         select_nodes2 = torch.nonzero(mask2, as_tuple=True)[0]
@@ -200,6 +205,8 @@ class fIterAlign:
                     x1_deg, x2_deg, adj1, adj2, self.num_dp_select, self.dp_min_degree, None
                 )
             else:
+                if epoch == 10:
+                    plot_pca_2d(x1, x2)
                 hot_nodes1, hot_nodes2, hot_nodes1_rank = self._select_nodes(
                     x1, x2, adj1, adj2, self.num_diffusion_select, None, align_links
                 )
@@ -214,6 +221,9 @@ class fIterAlign:
             for step in range(self.num_step):
                 hot_matrix1 = adj_norm1 @ hot_matrix1 + hot_matrix1
                 hot_matrix2 = adj_norm2 @ hot_matrix2 + hot_matrix2
+
+            hot_matrix1 = F.normalize(hot_matrix1, p=2, dim=-1)
+            hot_matrix2 = F.normalize(hot_matrix2, p=2, dim=-1)
 
             # Step 4: Concatenate the diffused features
             x1 = torch.cat([x1, hot_matrix1], dim=1)
