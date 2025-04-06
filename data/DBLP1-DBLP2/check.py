@@ -191,6 +191,17 @@ def calculate_matching_accuracy(groups, num_nodes):
     return accuracy
 
 
+def calculate_theoretical_accuracy(groups, num_nodes):
+    total_accuracy = 0.0
+    for nodes in groups.values():
+        size = len(nodes)
+        if size < 5:
+            total_accuracy += size * 1.0
+        else:
+            total_accuracy += size * (5.0 / size)
+    return (total_accuracy / num_nodes) * 100
+
+
 def main():
     """
     主函数，执行整个流程并输出结果。
@@ -222,6 +233,11 @@ def main():
     print(f"\nG1节点匹配的最高正确率为：{accuracy:.2f}%，等价类有{accuracy * num_nodes1 / 100:.2f}")
     accuracy = calculate_matching_accuracy(groups2, num_nodes2)
     print(f"\nG2节点匹配的最高正确率为：{accuracy:.2f}%，等价类有{accuracy * num_nodes2 / 100:.2f}")
+
+    accuracy = calculate_theoretical_accuracy(groups1, num_nodes1)
+    print(f"\nG1节点匹配的最高Hit@5正确率为：{accuracy:.2f}%")
+    accuracy = calculate_theoretical_accuracy(groups2, num_nodes2)
+    print(f"\nG2节点匹配的最高Hit@5正确率为：{accuracy:.2f}%")
 
     # 5. （可选）输出每个等价组的详细信息
     # print("\n等价组详细信息：")

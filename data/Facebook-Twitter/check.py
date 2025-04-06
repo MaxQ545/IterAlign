@@ -2,7 +2,7 @@ import torch
 import math
 from collections import defaultdict
 from tqdm import tqdm  # 导入 tqdm 以显示进度
-import networkx as nx  # 使用 networkx 进行自同构群判别
+
 
 def read_edgelist(file_path):
     """
@@ -26,6 +26,7 @@ def read_edgelist(file_path):
             max_node = max(max_node, u, v)
     return edges, max_node + 1  # 假设节点编号从0开始
 
+
 def build_adjacency_matrix(edges, num_nodes):
     """
     根据边列表构建邻接矩阵 (PyTorch)。
@@ -43,49 +44,84 @@ def build_adjacency_matrix(edges, num_nodes):
         adj[v][u] = 1  # 无向图对称
     return adj
 
-def graph_to_networkx(adj):
+
+def adjacency_matrix_to_list(adj):
     """
-    将邻接矩阵转换为 NetworkX 图对象。
+    将邻接矩阵转换为邻接表 (Python dict)。
 
     参数:
         adj (torch.Tensor): 邻接矩阵。
 
     返回:
-        G (networkx.Graph): NetworkX 图对象。
+        adj_list (dict): {node: [neighbors]}。
     """
-    G = nx.Graph()
     num_nodes = adj.shape[0]
+    adj_list = {}
     for i in range(num_nodes):
-        for j in range(i + 1, num_nodes):
-            if adj[i][j] == 1:
-                G.add_edge(i, j)
-    return G
+        neighbors = (adj[i].nonzero(as_tuple=True)[0]).tolist()
+        adj_list[i] = neighbors
+    return adj_list
 
-def group_equivalent_nodes_automorphism(adj):
+
+def wl_refinement(adj_list, max_iter=10):
     """
-    使用自同构群算法来分组等价节点。
+    对图进行 Weisfeiler-Lehman (WL) 迭代染色，返回每个节点最终的颜色。
+
+    参数:
+      adj_list (dict): {node: [neighbors]} 的邻接表
+      max_iter (int): 最大迭代轮数
+
+    返回:
+      color (dict): {node: color_id} 的最终着色结果
+    """
+    # 1. 初始颜色（使用节点度作为初始颜色）
+    color = {node: len(neighs) for node, neighs in adj_list.items()}
+
+    for iteration in tqdm(range(max_iter), desc="WL 迭代进度"):
+        new_color = {}
+        color_signature_map = {}
+        current_signature_id = 0
+
+        # 收集所有节点的新签名
+        for node in adj_list:
+            # 邻居的颜色收集后排序，保证签名一致
+            neigh_colors = sorted(color[neighbor] for neighbor in adj_list[node])
+            # 生成签名 (自身旧颜色, [邻居颜色...])
+            signature = (color[node], tuple(neigh_colors))
+            if signature not in color_signature_map:
+                color_signature_map[signature] = current_signature_id
+                current_signature_id += 1
+            new_color[node] = color_signature_map[signature]
+
+        # 检查是否收敛
+        if all(new_color[node] == color[node] for node in adj_list):
+            print(f"WL 算法在第 {iteration + 1} 轮迭代后收敛。")
+            break
+        color = new_color
+
+    return color
+
+
+def group_equivalent_nodes_wl(adj, max_iter=10):
+    """
+    使用WL算法来分组等价节点。
 
     参数:
         adj (torch.Tensor): 邻接矩阵。
+        max_iter (int): 最大WL迭代轮数。
 
     返回:
         groups (defaultdict): {color_value: [节点列表]}，即颜色分组（等价组）。
     """
-    # Step 1: Convert adjacency matrix to a networkx graph
-    G = graph_to_networkx(adj)
+    adj_list = adjacency_matrix_to_list(adj)
+    color_result = wl_refinement(adj_list, max_iter=max_iter)
 
-    # Step 2: Find automorphisms of the graph using networkx
-    # Detecting graph automorphisms (node equivalence) using networkx's built-in function
-    GM = nx.algorithms.isomorphism.GraphMatcher(G, G)
-    automorphisms = list(GM.isomorphisms_iter())
-
-    # Step 3: Group nodes based on automorphisms
+    # 根据最终的颜色进行分组
     groups = defaultdict(list)
-    for auto in automorphisms:
-        for node, mapped_node in auto.items():
-            groups[node].append(mapped_node)
-
+    for node, c in color_result.items():
+        groups[c].append(node)
     return groups
+
 
 def combination(n, k):
     """
@@ -101,6 +137,7 @@ def combination(n, k):
     if n < k:
         return 0
     return math.comb(n, k)  # Python 3.10 及以上支持
+
 
 def count_equivalent_groups(groups):
     """
@@ -118,6 +155,7 @@ def count_equivalent_groups(groups):
         if size >= 2:
             counts[size] += 1
     return counts
+
 
 def calculate_matching_accuracy(groups, num_nodes):
     """
@@ -152,6 +190,18 @@ def calculate_matching_accuracy(groups, num_nodes):
     accuracy = (total_accuracy / num_nodes) * 100
     return accuracy
 
+
+def calculate_theoretical_accuracy(groups, num_nodes):
+    total_accuracy = 0.0
+    for nodes in groups.values():
+        size = len(nodes)
+        if size < 5:
+            total_accuracy += size * 1.0
+        else:
+            total_accuracy += size * (5.0 / size)
+    return (total_accuracy / num_nodes) * 100
+
+
 def main():
     """
     主函数，执行整个流程并输出结果。
@@ -164,9 +214,9 @@ def main():
     adj1 = build_adjacency_matrix(edges1, num_nodes1)
     adj2 = build_adjacency_matrix(edges2, num_nodes2)
 
-    # 1. 使用自同构群算法进行节点等价分组
-    groups1 = group_equivalent_nodes_automorphism(adj1)
-    groups2 = group_equivalent_nodes_automorphism(adj2)
+    # 1. 使用WL算法进行节点等价分组
+    groups1 = group_equivalent_nodes_wl(adj1, max_iter=10)
+    groups2 = group_equivalent_nodes_wl(adj2, max_iter=10)
 
     # 2. 统计每种大小的等价组数量（排除子组合）
     counts1 = count_equivalent_groups(groups1)
@@ -183,6 +233,17 @@ def main():
     print(f"\nG1节点匹配的最高正确率为：{accuracy:.2f}%，等价类有{accuracy * num_nodes1 / 100:.2f}")
     accuracy = calculate_matching_accuracy(groups2, num_nodes2)
     print(f"\nG2节点匹配的最高正确率为：{accuracy:.2f}%，等价类有{accuracy * num_nodes2 / 100:.2f}")
+
+    accuracy = calculate_theoretical_accuracy(groups1, num_nodes1)
+    print(f"\nG1节点匹配的最高Hit@5正确率为：{accuracy:.2f}%")
+    accuracy = calculate_theoretical_accuracy(groups2, num_nodes2)
+    print(f"\nG2节点匹配的最高Hit@5正确率为：{accuracy:.2f}%")
+
+    # 5. （可选）输出每个等价组的详细信息
+    # print("\n等价组详细信息：")
+    # for c, nodes in groups.items():
+    #     print(f"颜色 {c}: {nodes}")
+
 
 if __name__ == "__main__":
     main()

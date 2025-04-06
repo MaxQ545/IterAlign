@@ -8,7 +8,7 @@ from config import configs
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default="fIterAlign")
-    parser.add_argument('--dataset', type=str, default="Facebook-Twitter")
+    parser.add_argument('--dataset', type=str, default="Arxiv1-Arxiv2")
     parser.add_argument('--remove-rate', type=float, default=0.00)
     args = parser.parse_args()
 
