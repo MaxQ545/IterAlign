@@ -278,5 +278,34 @@ configs = {
             "alignmethod": "greedy",
             "numtop": 10
         },
+    },
+    "SLOTAlign": {
+        "Facebook-Twitter": {
+            "joint_epoch": 100,
+            "truncate": False,
+            "feat_noise": 0.,
+            "noise_type": 0,
+            "bases": 2,
+            "step_size": 0.1,
+            "gw_beta": 0.01,
+        },
+        "DBLP1-DBLP2": {
+            "joint_epoch": 100,
+            "truncate": False,
+            "feat_noise": 0.,
+            "noise_type": 0,
+            "bases": 2,
+            "step_size": 0.1,
+            "gw_beta": 0.01,
+        },
+        "Arxiv1-Arxiv2": {
+            "joint_epoch": 100,
+            "truncate": False,
+            "feat_noise": 0.,
+            "noise_type": 0,
+            "bases": 2,
+            "step_size": 0.1,
+            "gw_beta": 0.01,
+        }
     }
 }

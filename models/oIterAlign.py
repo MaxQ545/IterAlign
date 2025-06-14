@@ -218,11 +218,11 @@ class oIterAlign:
         adj_norm2 = torch.eye(adj_norm2.shape[0], dtype=torch.float32, device=self.device) + adj_norm2
 
         # Precompute diffusion kernels
-        diffusion_kernel1 = torch.eye(x1.shape[0], dtype=torch.float32, device=self.device)
-        diffusion_kernel2 = torch.eye(x2.shape[0], dtype=torch.float32, device=self.device)
-        for step in range(self.num_step):
-            diffusion_kernel1 = adj_norm1 @ diffusion_kernel1
-            diffusion_kernel2 = adj_norm2 @ diffusion_kernel2
+        # diffusion_kernel1 = torch.eye(x1.shape[0], dtype=torch.float32, device=self.device)
+        # diffusion_kernel2 = torch.eye(x2.shape[0], dtype=torch.float32, device=self.device)
+        # for step in range(self.num_step):
+        #     diffusion_kernel1 = adj_norm1 @ diffusion_kernel1
+        #     diffusion_kernel2 = adj_norm2 @ diffusion_kernel2
 
         align_links = [[], []]
         align_ranks = []
@@ -248,13 +248,13 @@ class oIterAlign:
             hot_matrix2[hot_nodes2, range(len(hot_nodes2))] = 1.0
 
             # Diffuse using precomputed kernels
-            hot_matrix1 = diffusion_kernel1 @ hot_matrix1
-            hot_matrix2 = diffusion_kernel2 @ hot_matrix2
+            # hot_matrix1 = diffusion_kernel1 @ hot_matrix1
+            # hot_matrix2 = diffusion_kernel2 @ hot_matrix2
 
             # Diffusion by steps if not compute diffusion kernel first
-            # for step in range(self.num_step):
-            #     hot_matrix1 = adj_norm1 @ hot_matrix1
-            #     hot_matrix2 = adj_norm2 @ hot_matrix2
+            for step in range(self.num_step):
+                hot_matrix1 = adj_norm1 @ hot_matrix1
+                hot_matrix2 = adj_norm2 @ hot_matrix2
 
             # Concatenate diffusion results with the existing features
             x1 = torch.cat([x1, hot_matrix1], dim=1)
@@ -327,7 +327,6 @@ def edge2adj(edge_index):
     adj = torch.zeros(n, n, dtype=torch.float32)
     adj[edge_index[0], edge_index[1]] = 1.0
     adj[edge_index[1], edge_index[0]] = 1.0
-
     return adj
 
 

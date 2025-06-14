@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import torch.nn.functional as F
 from time import time
 
-from tensorboard.compat.tensorflow_stub.pywrap_tensorflow import masked_crc32c
-
 
 class fIterAlign:
     """
