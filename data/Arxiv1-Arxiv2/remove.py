@@ -5,7 +5,7 @@ file_path = 'G1.edgelist'
 G = nx.read_edgelist(file_path, nodetype=int)
 
 # Calculate the number of edges to remove (10% of the total)
-rm_rate = 0.07
+rm_rate = 0.01
 edges_to_remove = int(rm_rate * G.number_of_edges())
 
 # Ensure the graph remains connected after removing edges
@@ -14,7 +14,7 @@ import random
 def remove_edges_while_connected(graph, num_edges_to_remove):
     edges = list(graph.edges())
     removed_edges = []
-    for _ in range(num_edges_to_remove):
+    while len(removed_edges) < num_edges_to_remove:
         edge = random.choice(edges)
         graph.remove_edge(*edge)
         if nx.is_connected(graph):
