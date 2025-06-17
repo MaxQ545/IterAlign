@@ -1,2 +1,6 @@
 *.pyc
 .idea/
+*.log
+*.out
+*.txt
+*.csv

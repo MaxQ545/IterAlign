@@ -11,6 +11,8 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', type=str, default="Arxiv1-Arxiv2")
     parser.add_argument('--remove-rate', type=float, default=0.00)
     args = parser.parse_args()
+    if args.remove_rate > 0:
+        print(f"Warning: Removing {args.remove_rate * 100}% of edges from the graph.")
 
     # Step 1: Initialize dataset and model
     model_name = args.model

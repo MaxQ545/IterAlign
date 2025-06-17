@@ -69,6 +69,12 @@ class oIterAlign:
         deg_inv_sqrt1 = torch.diag(torch.pow(adj.sum(dim=1), -0.5))
         adj_norm = deg_inv_sqrt1 @ adj @ deg_inv_sqrt1
 
+        # deg_inv_sqrt1 = torch.diag(torch.pow(adj.sum(dim=1), -1))
+        # adj_norm = deg_inv_sqrt1 @ adj
+
+        # deg_inv_sqrt1 = torch.diag(torch.pow(adj.sum(dim=1), -0.5))
+        # adj_norm = deg_inv_sqrt1 @ adj @ deg_inv_sqrt1
+
         # Initialize a one-hot matrix (identity-like) for diffusion
         hot_matrix = torch.zeros_like(adj, dtype=torch.float32, device=self.device)
         hot_matrix[range(adj.shape[0]), range(adj.shape[0])] = 1.0
@@ -76,11 +82,14 @@ class oIterAlign:
         # Perform diffusion for the specified number of steps
         for t in range(self.num_step + 1):
             hot_matrix = adj_norm @ hot_matrix + hot_matrix
+            # hot_matrix = adj_norm @ hot_matrix
+            # hot_matrix = adj_norm @ hot_matrix
 
         # Sort features per node and retain the top 'output_dim'
-        feature = torch.sort(hot_matrix, dim=1)[0]
+        feature = hot_matrix
+        feature = torch.sort(feature, dim=1)[0]
         feature = feature[:, -output_dim:]
-        feature = F.normalize(feature, p=2, dim=-1)
+        # feature = F.normalize(feature, p=2, dim=-1)
 
         return feature
 
@@ -213,9 +222,23 @@ class oIterAlign:
         adj_norm1 = deg_inv_sqrt1 @ adj1 @ deg_inv_sqrt1
         adj_norm2 = deg_inv_sqrt2 @ adj2 @ deg_inv_sqrt2
 
+        # deg_inv_sqrt1 = torch.diag(torch.pow(adj1.sum(dim=1), -1))
+        # deg_inv_sqrt2 = torch.diag(torch.pow(adj2.sum(dim=1), -1))
+        # adj_norm1 = deg_inv_sqrt1 @ adj1
+        # adj_norm2 = deg_inv_sqrt2 @ adj2
+
+        # deg_inv_sqrt1 = torch.diag(torch.pow(adj1.sum(dim=1), -0.5))
+        # deg_inv_sqrt2 = torch.diag(torch.pow(adj2.sum(dim=1), -0.5))
+        # adj_norm1 = deg_inv_sqrt1 @ adj1 @ deg_inv_sqrt1
+        # adj_norm2 = deg_inv_sqrt2 @ adj2 @ deg_inv_sqrt2
+
         # Add self-loop
         adj_norm1 = torch.eye(adj_norm1.shape[0], dtype=torch.float32, device=self.device) + adj_norm1
         adj_norm2 = torch.eye(adj_norm2.shape[0], dtype=torch.float32, device=self.device) + adj_norm2
+        # pass
+        # pass
+        # pass
+        # pass
 
         # Precompute diffusion kernels
         # diffusion_kernel1 = torch.eye(x1.shape[0], dtype=torch.float32, device=self.device)

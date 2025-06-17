@@ -1,6 +1,6 @@
 import argparse
 from models import *
-from data import DataLoader
+from data_loader import DataLoader
 from evaluate import Evaluator
 from config import configs
 

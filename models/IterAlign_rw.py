@@ -14,7 +14,7 @@ from concurrent.futures import ProcessPoolExecutor
 from time import time
 
 
-class oIterAlign:
+class IterAlign_rw:
     """
     oIterAlign model for graph node alignment using damping propagation and diffusion alignment.
 

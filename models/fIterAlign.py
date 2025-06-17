@@ -198,13 +198,10 @@ class fIterAlign:
         for epoch in range(num_epoch):
             # Step 1: Select node pairs
             if epoch == 0:
-                plot_pca_2d(x1_deg, x2_deg)
                 hot_nodes1, hot_nodes2, hot_nodes1_rank = self._select_nodes(
                     x1_deg, x2_deg, adj1, adj2, self.num_dp_select, self.dp_min_degree, None
                 )
             else:
-                if epoch == 10:
-                    plot_pca_2d(x1, x2)
                 hot_nodes1, hot_nodes2, hot_nodes1_rank = self._select_nodes(
                     x1, x2, adj1, adj2, self.num_diffusion_select, None, align_links
                 )

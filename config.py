@@ -44,7 +44,7 @@ configs = {
             "diffusion_step": 7,
         },
         "Arxiv1-Arxiv2": {
-            "device": "cuda",
+            "device": "cuda:1",
             "seed": 42,
             "dp_min_degree": 6,
             "num_dp_select": 100,  # 100 for default
@@ -52,6 +52,34 @@ configs = {
             "diffusion_step": 8,
         },
     },
+
+    "IterAlign_rw": {
+        "Facebook-Twitter": {
+            "device": "cpu",
+            "seed": 42,
+            "dp_min_degree": 6,
+            "num_dp_select": 10,  # 10 for best
+            "num_diffusion_select": 20,
+            "diffusion_step": 5,
+        },
+        "DBLP1-DBLP2": {
+            "device": "cpu",
+            "seed": 42,
+            "dp_min_degree": 6,
+            "num_dp_select": 200,  # 200 for original dataset
+            "num_diffusion_select": 30,
+            "diffusion_step": 7,
+        },
+        "Arxiv1-Arxiv2": {
+            "device": "cpu",
+            "seed": 42,
+            "dp_min_degree": 6,
+            "num_dp_select": 100,  # 100 for default
+            "num_diffusion_select": 100,
+            "diffusion_step": 8,
+        },
+    },
+
 
     "MMNC_CENA": {
         "Facebook-Twitter": {
