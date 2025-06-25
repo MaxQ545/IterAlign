@@ -43,8 +43,8 @@ python main.py --model fIterAlign --dataset Facebook-Twitter --remove-rate 0.00
 
 ### Arguments
 
-  * `--model`: The model to be used. For our proposed method, use `fIterAlign`.
-  * `--dataset`: The dataset to perform graph alignment on (e.g., `Facebook-Twitter`).
+  * `--model`: The model to be used. For our proposed method, use `fIterAlign and oIterAlign`.
+  * `--dataset`: The dataset to perform graph alignment on (e.g., `Facebook-Twitter, DBLP1-DBLP2 and Arxiv1-Arxiv2`).
   * `--remove-rate`: The rate at which nodes are removed to test robustness. `0.00` indicates no nodes are removed.
 
 ## Citation
