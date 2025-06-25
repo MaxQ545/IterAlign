@@ -4,3 +4,5 @@
 *.out
 *.txt
 *.csv
+baselines/
+.DS_Store
