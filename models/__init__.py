@@ -9,5 +9,4 @@ from .REGAL import REGAL
 from .WLAlign import WLAlign
 from .fIterAlign import fIterAlign
 from .CONE import CONE
-from .SLOTAlign import SLOTAlign
 from .IterAlign_rw import IterAlign_rw
