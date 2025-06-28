@@ -4,6 +4,8 @@ This repository contains the official implementation of the paper: **Empowering 
 
 Our proposed method, **IterAlign**, is a novel, parameter-free, and efficient approach for Unsupervised Plain Graph Alignment (UPGA). IterAlign leverages heat diffusion to generate stable node representations, mitigating the over-reliance on strict structural consistency. By alternating between representation generation and node alignment, our model iteratively refines the alignment process, leading to superior and robust performance.
 
+![IterAlign](images/archi2.pdf)
+
 ## About The Project
 
 Existing Unsupervised Plain Graph Alignment (UPGA) methods often struggle with structural inconsistencies between real-world graphs, leading to biased node representations and suboptimal alignment. To address these limitations, we propose **IterAlign**, which introduces several key innovations:
