@@ -1,0 +1,12 @@
+torch
+torch-geometric
+gensim==4.3.3
+numpy==1.26.4
+scipy==1.13.1
+networkx==3.3
+scikit-learn==1.6.0
+POT==0.9.5
+psutil==7.0.0
+pynvml==12.0.0
+matplotlib
+pandas

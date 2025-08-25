@@ -3,6 +3,7 @@
 *.log
 *.out
 *.txt
+!requirements.txt
 *.csv
 baselines/
 .DS_Store
